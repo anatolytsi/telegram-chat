@@ -47,20 +47,6 @@ class RedisBusFactory(BusFactory, Bus, ABC, prefix=REDIS_BUS):
         return super().__new__(cls, bus_class=RedisBus)
 
 
-# class InternalBusFactory(Bus, ABC, prefix=INTERNAL_BUS):
-#     def __new__(cls, *args, **kwargs):
-#         obj = object.__new__(InternalBus)
-#         obj.__init__(*args, **kwargs)
-#         return obj
-#
-#
-# class RedisBusFactory(Bus, ABC, prefix=REDIS_BUS):
-#     def __new__(cls, *args, **kwargs):
-#         obj = object.__new__(RedisBus)
-#         obj.__init__(*args, **kwargs)
-#         return obj
-
-
 if __name__ == '__main__':
     def test_listener(message: any):
         print(message)
