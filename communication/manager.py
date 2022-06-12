@@ -30,7 +30,7 @@ class Bus(BusPrototype, ABC):
         return cls.__new__(cls._registry[USED_BUS])
 
 
-class BusFactory:
+class BusFactory(ABC):
     def __new__(cls, *args, bus_class, **kwargs):
         obj = object.__new__(bus_class)
         obj.__init__(*args, **kwargs)
