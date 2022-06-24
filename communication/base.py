@@ -1,10 +1,16 @@
 import asyncio
+from enum import Enum
 from typing import Callable
 
 MSG_UPD_INTERVAL = 0.01
 
 CHANNEL_KEY = 'channel'
 DATA_KEY = 'data'
+
+
+class BusDir(Enum):
+    TG = 1
+    COM = 2
 
 
 class BusPrototype:
@@ -30,11 +36,11 @@ class BusPrototype:
             self._loop = asyncio.get_event_loop()
             self._loop.create_task(self._worker())
 
-    def publish(self, channel: str, data: any) -> bool:
+    def publish(self, channel: str, direction: BusDir, data: any) -> bool:
         raise NotImplementedError
 
-    def subscribe(self, channel: str, listener: Callable[[any], any]) -> bool:
+    def subscribe(self, channel: str, direction: BusDir, listener: Callable[[any], any]) -> bool:
         raise NotImplementedError
 
-    def unsubscribe(self, channel: str) -> bool:
+    def unsubscribe(self, channel: str, direction: BusDir) -> bool:
         raise NotImplementedError

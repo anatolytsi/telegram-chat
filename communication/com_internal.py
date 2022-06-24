@@ -1,7 +1,7 @@
 from threading import Lock
 from typing import Callable
 
-from communication.base import BusPrototype
+from communication.base import BusPrototype, BusDir
 from communication.base import CHANNEL_KEY, DATA_KEY
 
 
@@ -19,21 +19,20 @@ class InternalBus(BusPrototype):
         else:
             return {}
 
-    def publish(self, channel: str, data: any) -> bool:
-        message = {CHANNEL_KEY: channel, DATA_KEY: data}
+    def publish(self, channel: str, direction: BusDir, data: any) -> bool:
+        message = {CHANNEL_KEY: f'{direction.value}: {channel}', DATA_KEY: data}
         with self._lock:
             self._message_bus.append(message)
         return True
 
-    def subscribe(self, channel: str, listener: Callable[[any], any]) -> bool:
+    def subscribe(self, channel: str, direction: BusDir, listener: Callable[[any], any]) -> bool:
         if channel not in self.channels:
-            self.channels.append(channel)
-            self._listeners[channel] = listener
+            self.channels.append(f'{direction.value}: {channel}')
+            self._listeners[f'{direction.value}: {channel}'] = listener
         self._start_thread()
         return True
 
-    def unsubscribe(self, channel: str) -> bool:
+    def unsubscribe(self, channel: str, direction: BusDir) -> bool:
         if channel in self.channels:
-            self.channels.remove(channel)
-            del self._listeners[channel]
+            del self._listeners[f'{direction.value}: {channel}']
         return True

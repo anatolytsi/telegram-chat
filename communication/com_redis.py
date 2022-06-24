@@ -5,7 +5,7 @@ from typing import Callable
 import redis
 from dotenv import load_dotenv
 
-from communication.base import BusPrototype
+from communication.base import BusPrototype, BusDir
 
 load_dotenv()
 
@@ -32,32 +32,31 @@ class RedisBus(BusPrototype):
                 pass
         return message
 
-    def publish(self, channel: str, data: any) -> bool:
+    def publish(self, channel: str, direction: BusDir, data: any) -> bool:
         try:
-            self._redis.publish(channel, json.dumps(data))
+            self._redis.publish(f'{direction.value}: {channel}', json.dumps(data))
             return True
         except Exception as e:
             print(e)
             return False
 
-    def subscribe(self, channel: str, listener: Callable[[any], any]) -> bool:
+    def subscribe(self, channel: str, direction: BusDir, listener: Callable[[any], any]) -> bool:
         try:
             if channel not in self.channels:
-                self._pubsub.subscribe(channel)
-                self.channels.append(channel)
-                self._listeners[channel] = listener
+                self._pubsub.subscribe(f'{direction.value}: {channel}')
+                self.channels.append(f'{direction.value}: {channel}')
+                self._listeners[f'{direction.value}: {channel}'] = listener
             self._start_thread()
             return True
         except Exception as e:
             print(e)
             return False
 
-    def unsubscribe(self, channel: str) -> bool:
+    def unsubscribe(self, channel: str, direction: BusDir) -> bool:
         try:
             if channel in self.channels:
-                self._pubsub.unsubscribe(channel)
-                self.channels.remove(channel)
-                del self._listeners[channel]
+                self._pubsub.unsubscribe(f'{direction.value}: {channel}')
+                del self._listeners[f'{direction.value}: {channel}']
             return True
         except Exception as e:
             print(e)
