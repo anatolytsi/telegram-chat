@@ -1,8 +1,8 @@
 from threading import Lock
 from typing import Callable
 
-from base import BusPrototype
-from base import CHANNEL_KEY, DATA_KEY
+from communication.base import BusPrototype
+from communication.base import CHANNEL_KEY, DATA_KEY
 
 
 class InternalBus(BusPrototype):

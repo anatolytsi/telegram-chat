@@ -4,9 +4,9 @@ from abc import ABC
 
 from dotenv import load_dotenv
 
-from base import BusPrototype
-from com_redis import RedisBus
-from com_internal import InternalBus
+from communication.base import BusPrototype
+from communication.com_redis import RedisBus
+from communication.com_internal import InternalBus
 
 load_dotenv()
 

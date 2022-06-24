@@ -5,7 +5,7 @@ from typing import Callable
 import redis
 from dotenv import load_dotenv
 
-from base import BusPrototype
+from communication.base import BusPrototype
 
 load_dotenv()
 
