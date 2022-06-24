@@ -3,6 +3,8 @@ import uuid
 from db.base import MongoManager, DATABASE, WEBSITES_COL, PasswordManager
 
 TOKEN_KEY = 'token'
+USERNAME_KEY = 'username'
+USER_CHANNEL_KEY = 'channel'
 HOST_KEY = 'host'
 ALIAS_KEY = 'alias'
 CREATOR_KEY = 'creator'
