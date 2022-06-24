@@ -1,5 +1,4 @@
-import time
-from threading import Thread
+import asyncio
 from typing import Callable
 
 MSG_UPD_INTERVAL = 0.01
@@ -13,22 +12,23 @@ class BusPrototype:
     def __init__(self, *args, **kwargs):
         self.channels = []
         self._listeners = {}
-        self._worker_thread = Thread(target=self._worker, daemon=True)
+        self._loop = None
 
     def _get_message(self) -> any:
         raise NotImplementedError
 
-    def _worker(self):
+    async def _worker(self):
         while True:
             message = self._get_message()
             if message and (channel := message[CHANNEL_KEY]) in self.channels:
-                self._listeners[channel](message)
+                await self._listeners[channel](message)
             else:
-                time.sleep(MSG_UPD_INTERVAL)
+                await asyncio.sleep(MSG_UPD_INTERVAL)
 
     def _start_thread(self):
-        if not self._worker_thread.is_alive():
-            self._worker_thread.start()
+        if not self._loop:
+            self._loop = asyncio.get_event_loop()
+            self._loop.create_task(self._worker())
 
     def publish(self, channel: str, data: any) -> bool:
         raise NotImplementedError
