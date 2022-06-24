@@ -41,6 +41,37 @@ def get_website(websites, token: str, password: str):
     return website
 
 
+def delete_db():
+    MongoManager().client.drop_database(DATABASE)
+
+
+def get_all_websites():
+    return list(get_websites_col().find({}))
+
+
+def get_website_hosts():
+    exception = {
+        ALIAS_KEY: 0,
+        CREATOR_KEY: 0,
+        PASSWORD_KEY: 0,
+        SUBS_KEY: 0,
+    }
+    return list(get_websites_col().find({}, exception))
+
+
+def get_website_subscribers(token: str):
+    exception = {
+        HOST_KEY: 0,
+        ALIAS_KEY: 0,
+        CREATOR_KEY: 0,
+        PASSWORD_KEY: 0
+    }
+    query = get_websites_col().find_one({TOKEN_KEY: token}, exception)
+    if query:
+        return query[SUBS_KEY]
+    return []
+
+
 def add_website(username: str, user_channel: int, host: str, alias: str, password: str) -> str:
     websites = get_websites_col()
     token = f'{uuid.uuid4()}'
