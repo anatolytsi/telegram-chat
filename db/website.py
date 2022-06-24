@@ -1,6 +1,6 @@
 import uuid
 
-from base import MongoManager, DATABASE, WEBSITES_COL, PasswordManager
+from db.base import MongoManager, DATABASE, WEBSITES_COL, PasswordManager
 
 TOKEN_KEY = 'token'
 HOST_KEY = 'host'
