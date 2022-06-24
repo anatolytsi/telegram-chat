@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv
 
-from telegram_chat.bot import TelegramBot
+from telegram.bot import TelegramBot
 
 load_dotenv()
 

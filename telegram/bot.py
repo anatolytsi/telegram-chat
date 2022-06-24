@@ -1,5 +1,5 @@
 from communication.base import CHANNEL_KEY, DATA_KEY
-from telegram_chat.base import BusMixin, TelegramBotMixin
+from telegram.base import BusMixin, TelegramBotMixin
 
 
 class TelegramBot(BusMixin, TelegramBotMixin):

@@ -7,7 +7,7 @@ from aiogram import Bot, Dispatcher, executor
 from communication.base import CHANNEL_KEY
 from communication.manager import Bus
 from db.website import get_website_hosts, get_website_subscribers, USER_CHANNEL_KEY, TOKEN_KEY, HOST_KEY
-from telegram_chat.handlers import BotStartHandleMixin, BotMessageHandleMixin
+from telegram.handlers import BotStartHandleMixin, BotMessageHandleMixin
 
 
 class BusMixin:
