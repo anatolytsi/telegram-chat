@@ -28,7 +28,8 @@ class RedisBus(BusPrototype):
         for key, value in message.items():
             try:
                 message[key] = value.decode()
-            except (UnicodeDecodeError, AttributeError):
+                message[key] = json.loads(message[key])
+            except (UnicodeDecodeError, AttributeError, json.decoder.JSONDecodeError):
                 pass
         return message
 
