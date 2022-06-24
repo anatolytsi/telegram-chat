@@ -2,8 +2,12 @@ import os
 import pymongo
 from passlib.context import CryptContext
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 MONGODB_HOST = os.environ.get('MONGODB_HOST')
-MONGODB_PORT = os.environ.get('MONGODB_PORT')
+MONGODB_PORT = int(os.environ.get('MONGODB_PORT'))
 
 CRYPT_SCHEMES = ['bcrypt', 'argon2', 'scrypt']
 CRYPT_DEFAULT = 'bcrypt'
