@@ -41,7 +41,7 @@ def get_website(websites, token: str, password: str):
     return website
 
 
-def add_website(username: str, host: str, alias: str, password: str) -> str:
+def add_website(username: str, user_channel: int, host: str, alias: str, password: str) -> str:
     websites = get_websites_col()
     token = f'{uuid.uuid4()}'
     password_hash = PasswordManager().ctx.hash(password)
@@ -51,7 +51,7 @@ def add_website(username: str, host: str, alias: str, password: str) -> str:
         ALIAS_KEY: alias,
         CREATOR_KEY: username,
         PASSWORD_KEY: password_hash,
-        SUBS_KEY: [username]
+        SUBS_KEY: [{USERNAME_KEY: username, USER_CHANNEL_KEY: user_channel}]
     }
     websites.insert_one(website)
     return token
@@ -70,12 +70,12 @@ def remove_website(username: str, token: str, password: str) -> str:
     return ''
 
 
-def subscribe_website(username: str, token: str, password: str) -> bool:
+def subscribe_website(username: str, user_channel: int, token: str, password: str) -> bool:
     try:
         websites = get_websites_col()
         website = get_website(websites, token, password)
         if username not in website[SUBS_KEY]:
-            website[SUBS_KEY].append(username)
+            website[SUBS_KEY].append({USERNAME_KEY: username, USER_CHANNEL_KEY: user_channel})
             websites.replace_one({TOKEN_KEY: token}, website, upsert=True)
         return True
     except Exception as e:
@@ -97,6 +97,9 @@ def unsubscribe_website(username: str, token: str, password: str) -> bool:
 
 
 if __name__ == '__main__':
-    token = add_website('test', 'test_website.com', 'Test Website', '12345678')
-    status = subscribe_website('test_user', token, '12345678')
+    delete_db()
+    # print(get_all_websites())
+    token = add_website('test', 299617516, '127.0.0.1', 'Test Website', '12345678')
+    print(token)
+    # status = subscribe_website('test_user', 299617516, token, '12345678')
 
