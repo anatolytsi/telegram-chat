@@ -20,6 +20,7 @@ if USED_BUS not in BUS_LIST:
 
 
 class Bus(BusPrototype, ABC):
+    _instance = None
     _registry = {}
 
     def __init_subclass__(cls, **kwargs):
@@ -27,7 +28,9 @@ class Bus(BusPrototype, ABC):
         cls._registry[kwargs['prefix']] = cls
 
     def __new__(cls, *args, **kwargs):
-        return cls.__new__(cls._registry[USED_BUS])
+        if not cls._instance:
+            cls._instance = cls.__new__(cls._registry[USED_BUS])
+        return cls._instance
 
 
 class BusFactory(ABC):
