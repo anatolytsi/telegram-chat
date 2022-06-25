@@ -10,9 +10,8 @@ class TelegramBotMixin(BotStartHandleMixin, BotMessageHandleMixin):
     def __init__(self, *args, tg_token, **kwargs):
         super().__init__(*args, **kwargs)
         self._bot: Bot = Bot(token=tg_token)
-        self._dispatcher: Dispatcher = Dispatcher(bot=self._bot)
-        for handler, commands in self._handlers:
-            self._dispatcher.register_message_handler(self._handle_caller(handler), commands=commands)
+        self._dispatcher: Dispatcher = Dispatcher(bot=self._bot, storage=self._storage)
+        self.add_handlers(self._dispatcher)
 
     def run(self):
         executor.start_polling(self._dispatcher, skip_updates=True)
