@@ -19,7 +19,6 @@ class BaseBotMixin:
 class BotStartHandleMixin(BaseBotMixin, handler='handle_start', commands=['start']):
     async def handle_start(self, message: types.Message):
         await message.answer('Welcome to Telegram Chat Bot!')
-        # await message.reply('Welcome to Telegram Chat Bot!')
 
 
 class BotMessageHandleMixin(BaseBotMixin, handler='handle_message', commands=None):
@@ -27,7 +26,7 @@ class BotMessageHandleMixin(BaseBotMixin, handler='handle_message', commands=Non
         await message.answer(message.text)
 
     async def handle_direct(self, message: types.Message):
-        await message.answer('Its just text!')
+        await message.answer('Reply to a message in order to send it to webchat')
 
     async def handle_message(self, message: types.Message):
         if message.reply_to_message:

@@ -23,5 +23,6 @@ class TelegramBotMixin(BotStartHandleMixin, BotMessageHandleMixin):
         # return await self._bot.send_message(chat_id=subscribers[0][USER_CHANNEL_KEY], text=msg, disable_notification=True)
         # Send message to all the subscribers
         return await asyncio.gather(
-            *[self._bot.send_message(chat_id=sub[USER_CHANNEL_KEY], text=msg, disable_notification=True)
+            *[self._bot.send_message(chat_id=sub[USER_CHANNEL_KEY],
+                                     text=msg, disable_notification=True, parse_mode='HTML')
               for sub in subscribers])
