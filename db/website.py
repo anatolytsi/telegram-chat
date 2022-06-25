@@ -122,13 +122,14 @@ def remove_website(username: str, token: str, password: str) -> str:
     try:
         websites = get_websites_col()
         website = get_website_privileged(websites, token, password)
+        alias = website[ALIAS_KEY]
         if username != website[CREATOR_KEY]:
             return 'Only creator is allowed to remove a website'
         websites.delete_one(website)
+        return alias
     except Exception as e:
         print(e)
         return str(e)
-    return ''
 
 
 def create_session_website(token: str) -> str:
@@ -150,30 +151,30 @@ def get_website_sessions(token: str) -> List[str]:
     return website[SESSIONS_KEY]
 
 
-def subscribe_website(username: str, user_channel: int, token: str, password: str) -> bool:
+def subscribe_website(username: str, user_channel: int, token: str, password: str) -> str:
     try:
         websites = get_websites_col()
         website = get_website_privileged(websites, token, password)
         if username not in website[SUBS_KEY]:
             website[SUBS_KEY].append({USERNAME_KEY: username, USER_CHANNEL_KEY: user_channel})
             websites.replace_one({TOKEN_KEY: token}, website, upsert=True)
-        return True
+        return website[ALIAS_KEY]
     except Exception as e:
         print(e)
-        return False
+        return ''
 
 
-def unsubscribe_website(username: str, token: str, password: str) -> bool:
+def unsubscribe_website(username: str, token: str, password: str) -> str:
     try:
         websites = get_websites_col()
         website = get_website_privileged(websites, token, password)
         if username in website[SUBS_KEY]:
             website[SUBS_KEY].remove(username)
             websites.update_one(website)
-        return True
+        return website[ALIAS_KEY]
     except Exception as e:
         print(e)
-        return False
+        return ''
 
 
 if __name__ == '__main__':
@@ -182,4 +183,3 @@ if __name__ == '__main__':
     token = add_website('test', 299617516, '127.0.0.1', 'Test Website', '12345678')
     print(token)
     # status = subscribe_website('test_user', 299617516, token, '12345678')
-
