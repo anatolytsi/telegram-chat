@@ -194,7 +194,7 @@ class SubPassHandle(BaseBotMixin,
             markup = types.ReplyKeyboardRemove()
             if alias:
                 await message.answer(f'Success!\n'
-                                     f'Website <b>{alias}</b> was added!\n',
+                                     f'You have subscribed to <b>{alias}</b>!\n',
                                      parse_mode='HTML', reply_markup=markup)
             else:
                 await message.answer(f'Token or password is incorrect. Try again!', reply_markup=markup)
