@@ -1,11 +1,10 @@
-import json
 import os
-from typing import Callable
+from typing import Callable, Union
 
 import redis
 from dotenv import load_dotenv
 
-from communication.base import BusPrototype, BusDir
+from communication.base import BusPrototype, BusDir, BusMessage, DATA_KEY
 
 load_dotenv()
 
@@ -21,21 +20,20 @@ class RedisBus(BusPrototype):
         self._redis = redis.StrictRedis(host=REDIS_HOST, port=REDIS_PORT, db=0)
         self._pubsub = self._redis.pubsub()
 
-    def _get_message(self) -> any:
-        message = self._pubsub.get_message()
-        if not message or message['type'] == 'subscribe':
-            return {}
-        for key, value in message.items():
+    def _get_message(self) -> Union[BusMessage, None]:
+        redis_message = self._pubsub.get_message()
+        if not redis_message or redis_message['type'] == 'subscribe':
+            return None
+        for key, value in redis_message.items():
             try:
-                message[key] = value.decode()
-                message[key] = json.loads(message[key])
-            except (UnicodeDecodeError, AttributeError, json.decoder.JSONDecodeError):
+                redis_message[key] = value.decode()
+            except (UnicodeDecodeError, AttributeError):
                 pass
-        return message
+        return BusMessage(redis_message[DATA_KEY])
 
-    def publish(self, channel: str, direction: BusDir, data: any) -> bool:
+    def publish(self, message: BusMessage) -> bool:
         try:
-            self._redis.publish(f'{direction.value}: {channel}', json.dumps(data))
+            self._redis.publish(message.dir_channel, str(message))
             return True
         except Exception as e:
             print(e)

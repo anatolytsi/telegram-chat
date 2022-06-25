@@ -1,26 +1,24 @@
 from threading import Lock
-from typing import Callable
+from typing import Callable, Union, List
 
-from communication.base import BusPrototype, BusDir
-from communication.base import CHANNEL_KEY, DATA_KEY
+from communication.base import BusPrototype, BusDir, BusMessage
 
 
 class InternalBus(BusPrototype):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._message_bus = []
+        self._message_bus: List[BusMessage] = []
         self._lock = Lock()
 
-    def _get_message(self) -> any:
+    def _get_message(self) -> Union[BusMessage, None]:
         if self._message_bus:
             with self._lock:
                 return self._message_bus.pop()
         else:
-            return {}
+            return None
 
-    def publish(self, channel: str, direction: BusDir, data: any) -> bool:
-        message = {CHANNEL_KEY: f'{direction.value}: {channel}', DATA_KEY: data}
+    def publish(self, message: BusMessage) -> bool:
         with self._lock:
             self._message_bus.append(message)
         return True

@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from typing import Dict
 
-from communication.base import CHANNEL_KEY
+from communication.base import BusMessage
 from communication.manager import Bus
 from db.website import get_website_hosts, TOKEN_KEY, HOST_KEY
 
@@ -27,7 +27,7 @@ class BusMixin:
         self._bus_websites[token] = host
         self._bus.subscribe(token, self._sub_dir, lambda msg: self._on_bus_message(msg))
 
-    async def _on_bus_message(self, message: any):
+    async def _on_bus_message(self, message: BusMessage):
         # if self.verify_bus_sender(message[DATA_KEY][HOST_KEY], message[CHANNEL_KEY]):
         #     # TODO: send an error message?
         #     return await self.on_bus_message(message)
@@ -40,12 +40,9 @@ class BusMixin:
         return False
 
     @abstractmethod
-    async def on_bus_message(self, message: any):
+    async def on_bus_message(self, message: BusMessage):
         pass
 
-    def send_bus_message(self, token: str, message: any):
-        return self._bus.publish(token, self._pub_dir, message)
-
-    @staticmethod
-    def get_bus_channel(message: any):
-        return message[CHANNEL_KEY]
+    def send_bus_message(self, token: str, data: any):
+        message = BusMessage(channel=token, direction=self._pub_dir, data=data)
+        return self._bus.publish(message)
