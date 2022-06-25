@@ -1,14 +1,16 @@
 import asyncio
 
 from aiogram import Bot, Dispatcher, executor
+from aiogram.contrib.fsm_storage.memory import MemoryStorage
 
 from db.website import get_website_subscribers, USER_CHANNEL_KEY
-from telegram.handlers import BotStartHandleMixin, BotMessageHandleMixin
+from telegram.handlers import BotStartHandleMixin, BotMessageHandleMixin, BotWebsitesMixin
 
 
-class TelegramBotMixin(BotStartHandleMixin, BotMessageHandleMixin):
+class TelegramBotMixin(BotStartHandleMixin, BotMessageHandleMixin, BotWebsitesMixin):
     def __init__(self, *args, tg_token, **kwargs):
         super().__init__(*args, **kwargs)
+        self._storage = MemoryStorage()
         self._bot: Bot = Bot(token=tg_token)
         self._dispatcher: Dispatcher = Dispatcher(bot=self._bot, storage=self._storage)
         self.add_handlers(self._dispatcher)
