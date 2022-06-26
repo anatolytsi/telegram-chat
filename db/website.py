@@ -29,6 +29,7 @@ def get_websites_col():
     websites = db[WEBSITES_COL]
     if 'search_index' not in websites.index_information():
         websites.create_index(TOKEN_KEY, name='search_index', unique=True)
+        websites.create_index(HOST_KEY, unique=True)
     return websites
 
 
@@ -55,7 +56,25 @@ def get_website(websites, token: str):
 def get_full_token(token_end: str) -> str:
     websites = get_websites_col()
     website = websites.find_one({TOKEN_KEY: {'$regex': f'-{token_end}$'}})
-    return website[TOKEN_KEY]
+    if website:
+        return website[TOKEN_KEY]
+    return ''
+
+
+def get_token_from_host(host: str) -> str:
+    websites = get_websites_col()
+    website = websites.find_one({HOST_KEY: host})
+    if website:
+        return website[TOKEN_KEY]
+    return ''
+
+
+def get_host_from_token(token: str) -> str:
+    websites = get_websites_col()
+    website = websites.find_one({TOKEN_KEY: token})
+    if website:
+        return website[HOST_KEY]
+    return ''
 
 
 def get_full_session_key(token: str, session_end: str) -> str:
@@ -102,20 +121,24 @@ def get_website_subscribers(token: str):
 
 
 def add_website(username: str, user_channel: int, host: str, alias: str, password: str) -> str:
-    websites = get_websites_col()
-    token = f'{uuid.uuid4()}'
-    password_hash = PasswordManager().ctx.hash(password)
-    website = {
-        TOKEN_KEY: token,
-        HOST_KEY: host,
-        ALIAS_KEY: alias,
-        CREATOR_KEY: username,
-        PASSWORD_KEY: password_hash,
-        SUBS_KEY: [{USERNAME_KEY: username, USER_CHANNEL_KEY: user_channel}],
-        SESSIONS_KEY: []
-    }
-    websites.insert_one(website)
-    return token
+    try:
+        websites = get_websites_col()
+        token = f'{uuid.uuid4()}'
+        password_hash = PasswordManager().ctx.hash(password)
+        website = {
+            TOKEN_KEY: token,
+            HOST_KEY: host,
+            ALIAS_KEY: alias,
+            CREATOR_KEY: username,
+            PASSWORD_KEY: password_hash,
+            SUBS_KEY: [{USERNAME_KEY: username, USER_CHANNEL_KEY: user_channel}],
+            SESSIONS_KEY: []
+        }
+        websites.insert_one(website)
+        return token
+    except Exception as e:
+        print(e)
+        return ''
 
 
 def remove_website(username: str, token: str, password: str) -> str:
@@ -143,6 +166,17 @@ def create_session_website(token: str) -> str:
     except Exception as e:
         print(e)
         return ''
+
+
+def validate_website_session(token: str, session_key: str) -> bool:
+    try:
+        websites = get_websites_col()
+        website = get_website(websites, token)
+        if session_key in website[SESSIONS_KEY]:
+            return True
+    except Exception as e:
+        print(e)
+    return False
 
 
 def get_website_sessions(token: str) -> List[str]:
@@ -180,6 +214,6 @@ def unsubscribe_website(username: str, token: str, password: str) -> str:
 if __name__ == '__main__':
     delete_db()
     # print(get_all_websites())
-    token = add_website('test', 299617516, '127.0.0.1', 'Test Website', '12345678')
-    print(token)
+    # token = add_website('test', 299617516, '127.0.0.1', 'Test Website', '12345678')
+    # print(token)
     # status = subscribe_website('test_user', 299617516, token, '12345678')
