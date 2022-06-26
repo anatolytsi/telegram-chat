@@ -64,6 +64,21 @@ class BotStartHandleMixin(BaseBotMixin,
         await message.answer('Welcome to Telegram Chat Bot!')
 
 
+class BotCancelStateHandleMixin(BaseBotMixin,
+                                handler='handle_cancel',
+                                commands=['cancel'],
+                                description='Cancel current operation',
+                                state='*'):
+    async def handle_cancel(self, message: types.Message, state: FSMContext):
+        current_state = await state.get_state()
+        if current_state is None:
+            return
+
+        await state.finish()
+        # And remove keyboard (just in case)
+        await message.reply('Operation cancelled', reply_markup=types.ReplyKeyboardRemove())
+
+
 class AddWebsiteEntry(BaseBotMixin,
                       handler='handle_add_website',
                       commands=['add_website'],
