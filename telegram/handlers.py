@@ -26,6 +26,28 @@ class BaseBotMixin:
                 dispatcher.register_message_handler(self._handle_caller(handler), commands=commands, state=state)
 
 
+# State groups
+class AddWebsiteForm(StatesGroup):
+    host = State()
+    alias = State()
+    password = State()
+
+
+class RemoveWebsiteForm(StatesGroup):
+    token = State()
+    password = State()
+
+
+class SubWebsiteForm(StatesGroup):
+    token = State()
+    password = State()
+
+
+class UnsubWebsiteForm(StatesGroup):
+    token = State()
+    password = State()
+
+
 class BotStartHandleMixin(BaseBotMixin,
                           handler='handle_start',
                           commands=['start'],
@@ -33,12 +55,6 @@ class BotStartHandleMixin(BaseBotMixin,
 
     async def handle_start(self, message: types.Message):
         await message.answer('Welcome to Telegram Chat Bot!')
-
-
-class AddWebsiteForm(StatesGroup):
-    host = State()
-    alias = State()
-    password = State()
 
 
 class AddWebsiteEntry(BaseBotMixin,
@@ -103,11 +119,6 @@ class BotAddWebsiteMixin(AddWebsiteEntry, AddHostHandle, AddAliasHandle, AddPass
     pass
 
 
-class RemoveWebsiteForm(StatesGroup):
-    token = State()
-    password = State()
-
-
 class RemoveWebsiteEntry(BaseBotMixin,
                          handler='handle_remove_website',
                          commands=['remove_website'],
@@ -154,11 +165,6 @@ class BotRemoveWebsiteMixin(RemoveWebsiteEntry, RemoveTokenHandle, RemovePassHan
     pass
 
 
-class SubWebsiteForm(StatesGroup):
-    token = State()
-    password = State()
-
-
 class SubWebsiteEntry(BaseBotMixin,
                       handler='handle_sub_website',
                       commands=['sub_website'],
@@ -203,11 +209,6 @@ class SubPassHandle(BaseBotMixin,
 
 class BotSubWebsiteMixin(SubWebsiteEntry, SubTokenHandle, SubPassHandle):
     pass
-
-
-class UnsubWebsiteForm(StatesGroup):
-    token = State()
-    password = State()
 
 
 class UnsubWebsiteEntry(BaseBotMixin,
