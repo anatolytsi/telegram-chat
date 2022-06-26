@@ -16,6 +16,7 @@ class TelegramBotMixin(BotStartHandleMixin, BotMessageHandleMixin, BotWebsitesMi
         self.add_msg_handlers(self._dispatcher)
 
     def run(self):
+        asyncio.get_event_loop().run_until_complete(self.set_commands(self._bot))
         executor.start_polling(self._dispatcher, skip_updates=True)
         asyncio.get_event_loop().run_forever()
 

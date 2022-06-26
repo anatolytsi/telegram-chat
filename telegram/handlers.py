@@ -1,4 +1,4 @@
-from aiogram import types, Dispatcher
+from aiogram import types, Dispatcher, Bot
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 
@@ -8,11 +8,14 @@ from db.website import HOST_KEY, ALIAS_KEY, PASSWORD_KEY, add_website, TOKEN_KEY
 
 class BaseBotMixin:
     _msg_handlers = []
+    _commands = []
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__()
         if 'handler' in kwargs and 'commands' in kwargs and 'state' in kwargs:
             cls._msg_handlers.append([cls, kwargs['handler'], kwargs['commands'], kwargs['state']])
+            if 'description' in kwargs and 'commands' in kwargs:
+                cls._commands.append(types.BotCommand(kwargs['commands'][0], kwargs['description']))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -24,6 +27,9 @@ class BaseBotMixin:
         for subcls, handler, commands, state in self._msg_handlers:
             if subcls in self.__class__.mro():
                 dispatcher.register_message_handler(self._handle_caller(handler), commands=commands, state=state)
+
+    async def set_commands(self, bot: Bot):
+        await bot.set_my_commands(self._commands)
 
 
 # State groups
@@ -51,6 +57,7 @@ class UnsubWebsiteForm(StatesGroup):
 class BotStartHandleMixin(BaseBotMixin,
                           handler='handle_start',
                           commands=['start'],
+                          description='Starts the bot',
                           state=None):
 
     async def handle_start(self, message: types.Message):
@@ -60,6 +67,7 @@ class BotStartHandleMixin(BaseBotMixin,
 class AddWebsiteEntry(BaseBotMixin,
                       handler='handle_add_website',
                       commands=['add_website'],
+                      description='Add new website to app',
                       state=None):
 
     async def handle_add_website(self, message: types.Message):
@@ -122,6 +130,7 @@ class BotAddWebsiteMixin(AddWebsiteEntry, AddHostHandle, AddAliasHandle, AddPass
 class RemoveWebsiteEntry(BaseBotMixin,
                          handler='handle_remove_website',
                          commands=['remove_website'],
+                         description='Remove existing website from app',
                          state=None):
 
     async def handle_remove_website(self, message: types.Message):
@@ -168,6 +177,7 @@ class BotRemoveWebsiteMixin(RemoveWebsiteEntry, RemoveTokenHandle, RemovePassHan
 class SubWebsiteEntry(BaseBotMixin,
                       handler='handle_sub_website',
                       commands=['sub_website'],
+                      description='Subscribe to an existing website',
                       state=None):
 
     async def handle_sub_website(self, message: types.Message):
@@ -214,6 +224,7 @@ class BotSubWebsiteMixin(SubWebsiteEntry, SubTokenHandle, SubPassHandle):
 class UnsubWebsiteEntry(BaseBotMixin,
                         handler='handle_unsub_website',
                         commands=['unsub_website'],
+                        description='Unsubscribe from an existing website',
                         state=None):
 
     async def handle_unsub_website(self, message: types.Message):
