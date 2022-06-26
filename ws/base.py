@@ -3,13 +3,13 @@ import json
 from typing import Dict
 
 from websockets import serve
-from websockets.exceptions import ConnectionClosedOK
+from websockets.exceptions import ConnectionClosedOK, ConnectionClosedError
 from websockets.legacy.server import WebSocketServerProtocol
 
 from communication.base import BusDir, BusMessage
 from communication.mixins import BusMixin
 from db.messaging import ChatMessage, add_message, get_messages
-from db.website import TOKEN_KEY, create_session_website
+from db.website import TOKEN_KEY, create_session_website, validate_website_session
 
 SESSION_KEY = 'session'
 HISTORY_KEY = 'history'
@@ -56,13 +56,17 @@ class WebsocketServer(BusMixin):
         add_message(chat_message)
         if message.data[SESSION_KEY] in self._connections:
             await self._connections[message.data[SESSION_KEY]].send(chat_message.to_json())
+        else:
+            reply_message = {**chat_message.to_dict(), 'text': 'User has already left'}
+            self.send_bus_message(chat_message.token, reply_message)
 
     async def _session_established(self, websocket: WebSocketServerProtocol) -> str:
         message = self._decode_msg(await websocket.recv())
         if not await self._verify_msg(websocket, message):
             return ''
 
-        if SESSION_KEY in message and message[SESSION_KEY]:
+        if SESSION_KEY in message and message[SESSION_KEY] and \
+                validate_website_session(message[TOKEN_KEY], message[SESSION_KEY]):
             session_key = message[SESSION_KEY]
         else:
             session_key = self._request_session_key(message[TOKEN_KEY])
