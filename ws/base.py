@@ -93,9 +93,9 @@ class WebsocketServer(BusMixin):
                     return
                 chat_message = ChatMessage.from_dict(message)
                 add_message(chat_message)
-                self.send_bus_message(message[TOKEN_KEY], chat_message.to_dict())
+                self.send_bus_message(chat_message.token, chat_message.to_dict())
                 print(chat_message)
-        except ConnectionClosedOK:
+        except (ConnectionClosedOK, ConnectionClosedError):
             if session_key:
                 del self._connections[session_key]
 
