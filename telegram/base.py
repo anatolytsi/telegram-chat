@@ -13,7 +13,7 @@ class TelegramBotMixin(BotStartHandleMixin, BotMessageHandleMixin, BotWebsitesMi
         self._storage = MemoryStorage()
         self._bot: Bot = Bot(token=tg_token)
         self._dispatcher: Dispatcher = Dispatcher(bot=self._bot, storage=self._storage)
-        self.add_handlers(self._dispatcher)
+        self.add_msg_handlers(self._dispatcher)
 
     def run(self):
         executor.start_polling(self._dispatcher, skip_updates=True)

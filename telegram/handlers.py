@@ -7,12 +7,12 @@ from db.website import HOST_KEY, ALIAS_KEY, PASSWORD_KEY, add_website, TOKEN_KEY
 
 
 class BaseBotMixin:
-    _handlers = []
+    _msg_handlers = []
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__()
         if 'handler' in kwargs and 'commands' in kwargs and 'state' in kwargs:
-            cls._handlers.append([cls, kwargs['handler'], kwargs['commands'], kwargs['state']])
+            cls._msg_handlers.append([cls, kwargs['handler'], kwargs['commands'], kwargs['state']])
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -20,8 +20,8 @@ class BaseBotMixin:
     def _handle_caller(self, handler: str):
         return getattr(self, handler)
 
-    def add_handlers(self, dispatcher: Dispatcher):
-        for subcls, handler, commands, state in self._handlers:
+    def add_msg_handlers(self, dispatcher: Dispatcher):
+        for subcls, handler, commands, state in self._msg_handlers:
             if subcls in self.__class__.mro():
                 dispatcher.register_message_handler(self._handle_caller(handler), commands=commands, state=state)
 
