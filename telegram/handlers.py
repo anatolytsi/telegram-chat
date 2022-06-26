@@ -127,14 +127,17 @@ class AddPassHandle(BaseBotMixin,
             token = add_website(message.chat.username, message.chat.id, **dict(data))
             markup = types.ReplyKeyboardRemove()
             if token:
-                await message.answer(f'Success!\n'
+                await message.answer(f'Success!🥳\n'
                                      f'Website <b>{data[ALIAS_KEY]}</b> was added!\n'
-                                     f'Your token is <b>{token}</b>\n'
-                                     f'Your password is <b>{data[PASSWORD_KEY]}</b>\n'
-                                     f'You can now allow other users to subscribe to it!',
+                                     f'Your token is \n  <code>{token}</code>\n'
+                                     f'Your password is \n  <code>{data[PASSWORD_KEY]}</code>\n'
+                                     f'You can now allow other users to subscribe to it!\n'
+                                     f'Don\'t loose this data!😉',
                                      parse_mode='HTML', reply_markup=markup)
             else:
-                await message.answer(f'Unfortunately, something went wrong :(', reply_markup=markup)
+                await message.answer(f'Unfortunately, something went wrong :(\n'
+                                     f'Could be that a website with this domain was already added before',
+                                     reply_markup=markup)
         await state.finish()
 
 
