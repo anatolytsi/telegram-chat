@@ -34,7 +34,7 @@ class BusMixin:
         return await self.on_bus_message(message)
 
     def verify_bus_sender(self, host: str, token: str):
-        if token in self._bus_websites and self._bus_websites[token] == host:
+        if token in self._bus_websites and self._bus_websites[token] in host:
             return True
         print(f'Token and/or host are incorrect')
         return False
