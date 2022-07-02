@@ -106,6 +106,17 @@ def get_website_hosts():
     return list(get_websites_col().find({}, exception))
 
 
+def get_website_tokens_hosts():
+    exception = {
+        ALIAS_KEY: 0,
+        CREATOR_KEY: 0,
+        PASSWORD_KEY: 0,
+        SUBS_KEY: 0,
+        SESSIONS_KEY: 0,
+    }
+    return list(get_websites_col().find({}, exception))
+
+
 def get_website_subscribers(token: str):
     exception = {
         HOST_KEY: 0,
