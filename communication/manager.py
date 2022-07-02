@@ -5,8 +5,6 @@ from abc import ABC
 from dotenv import load_dotenv
 
 from communication.base import BusPrototype
-from communication.com_redis import RedisBus
-from communication.com_internal import InternalBus
 
 load_dotenv()
 
@@ -17,6 +15,11 @@ BUS_LIST = [REDIS_BUS, INTERNAL_BUS]
 USED_BUS = os.environ.get('USED_BUS')
 if USED_BUS not in BUS_LIST:
     raise NotImplementedError(f'Bus {USED_BUS} is not supported')
+
+if USED_BUS == REDIS_BUS:
+    from communication.com_redis import RedisBus
+if USED_BUS == INTERNAL_BUS:
+    from communication.com_internal import InternalBus
 
 
 class Bus(BusPrototype, ABC):
@@ -40,14 +43,16 @@ class BusFactory(ABC):
         return obj
 
 
-class InternalBusFactory(BusFactory, Bus, ABC, prefix=INTERNAL_BUS):
-    def __new__(cls, *args, **kwargs):
-        return super().__new__(cls, bus_class=InternalBus)
+if USED_BUS == INTERNAL_BUS:
+    class InternalBusFactory(BusFactory, Bus, ABC, prefix=INTERNAL_BUS):
+        def __new__(cls, *args, **kwargs):
+            return super().__new__(cls, bus_class=InternalBus)
 
 
-class RedisBusFactory(BusFactory, Bus, ABC, prefix=REDIS_BUS):
-    def __new__(cls, *args, **kwargs):
-        return super().__new__(cls, bus_class=RedisBus)
+if USED_BUS == REDIS_BUS:
+    class RedisBusFactory(BusFactory, Bus, ABC, prefix=REDIS_BUS):
+        def __new__(cls, *args, **kwargs):
+            return super().__new__(cls, bus_class=RedisBus)
 
 
 if __name__ == '__main__':
