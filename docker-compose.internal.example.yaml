@@ -26,9 +26,6 @@ services:
     volumes:
       - tg_mongodb_volume:/data/db
     restart: always
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=
-      - MONGO_INITDB_ROOT_PASSWORD=
     networks:
       - tg-network
 
