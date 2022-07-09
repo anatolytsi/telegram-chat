@@ -1,4 +1,5 @@
 import asyncio
+from typing import List
 
 from aiogram import Bot, Dispatcher, executor
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
@@ -20,11 +21,14 @@ class TelegramBotMixin(BotStartHandleMixin, BotMessageHandleMixin, BotWebsitesMi
         executor.start_polling(self._dispatcher, skip_updates=True)
         asyncio.get_event_loop().run_forever()
 
+    async def _send_to_channels(self, channels: List[str], msg: str):
+        return await asyncio.gather(
+            *[self._bot.send_message(chat_id=channel,
+                                     text=msg, disable_notification=True, parse_mode='HTML')
+              for channel in channels])
+
     async def send_tg_message(self, token: str, msg: str):
         subscribers = get_website_subscribers(token)
         # return await self._bot.send_message(chat_id=subscribers[0][USER_CHANNEL_KEY], text=msg, disable_notification=True)
         # Send message to all the subscribers
-        return await asyncio.gather(
-            *[self._bot.send_message(chat_id=sub[USER_CHANNEL_KEY],
-                                     text=msg, disable_notification=True, parse_mode='HTML')
-              for sub in subscribers])
+        return await self._send_to_channels([sub[USER_CHANNEL_KEY] for sub in subscribers], msg)
