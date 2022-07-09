@@ -52,6 +52,7 @@ class WebsocketServer(BusMixin):
         return [msg.to_dict() for msg in messages]
 
     async def on_bus_message(self, message: BusMessage):
+        await super().on_bus_message(message)
         chat_message = ChatMessage(**message.data)
         add_message(chat_message)
         if message.data[SESSION_KEY] in self._connections:

@@ -21,6 +21,7 @@ class TelegramBot(BusMixin, TelegramBotMixin):
         super().__init__(*args, sub_dir=BusDir.COM, pub_dir=BusDir.TG, **kwargs)
 
     async def on_bus_message(self, message: BusMessage):
+        await super().on_bus_message(message)
         chat_message: ChatMessage = ChatMessage.from_dict(message.data)
         host = f'{HOST_TXT}<b>{get_host_from_token(chat_message.token)}</b>'
         # token_id = f'{TOKEN_TXT}{chat_message.token[-12:]}'

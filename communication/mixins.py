@@ -1,9 +1,15 @@
+import re
 from abc import abstractmethod
 from typing import Dict
 
 from communication.base import BusMessage
 from communication.manager import Bus
 from db.website import get_website_hosts, TOKEN_KEY, HOST_KEY, get_website_tokens_hosts
+
+HOST_CLEAN_PATTERNS = (re.compile(r'(https://)?'),
+                       re.compile(r'(http://)?'),
+                       re.compile(r'(www\.)?'),
+                       re.compile(r'(/$)?'))
 
 
 class BusMixin:
@@ -33,12 +39,15 @@ class BusMixin:
         #     return await self.on_bus_message(message)
         return await self.on_bus_message(message)
 
-    def verify_bus_sender(self, host: str, token: str):
+    def _update_tokens(self):
         tokens_hosts = get_website_tokens_hosts()
         for token_host in tokens_hosts:
             if token_host[TOKEN_KEY] not in self._bus_websites:
                 self._subscribe_bus(token_host[HOST_KEY], token_host[TOKEN_KEY])
-        # FIXME: new token is never added to the bus, probably better to ask database for tokens
+
+    def verify_bus_sender(self, host: str, token: str):
+        if token not in self._bus_websites:
+            self._update_tokens()
         if token in self._bus_websites and self._bus_websites[token] in host:
             return True
         print(f'Token and/or host are incorrect')
@@ -46,7 +55,8 @@ class BusMixin:
 
     @abstractmethod
     async def on_bus_message(self, message: BusMessage):
-        pass
+        if message.data[TOKEN_KEY] not in self._bus_websites:
+            self._update_tokens()
 
     def send_bus_message(self, token: str, data: any):
         message = BusMessage(channel=token, direction=self._pub_dir, data=data)
