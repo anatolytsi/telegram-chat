@@ -126,9 +126,9 @@ class AddPassHandle(BaseBotMixin,
         async with state.proxy() as data:
             data[PASSWORD_KEY] = message.text
             if message.chat.type == 'private':
-                token = add_website(message.chat.username, **dict(data))
+                token = add_website(message.chat.username, message.chat.id, **dict(data))
             else:
-                token = add_website(message.chat.title, **dict(data))
+                token = add_website(message.chat.title, message.chat.id, **dict(data))
             markup = types.ReplyKeyboardRemove()
             if token:
                 await message.answer(f'Success!🥳\n'
