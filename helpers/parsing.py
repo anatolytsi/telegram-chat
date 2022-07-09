@@ -3,6 +3,7 @@ import re
 HOST_CLEAN_PATTERNS = (re.compile(r'(https://)?'),
                        re.compile(r'(http://)?'),
                        re.compile(r'(www\.)?'),
+                       re.compile(r'(:\d+)?'),
                        re.compile(r'(/$)?'))
 
 
