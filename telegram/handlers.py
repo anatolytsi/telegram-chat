@@ -4,6 +4,7 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 
 from db.website import HOST_KEY, ALIAS_KEY, PASSWORD_KEY, add_website, TOKEN_KEY, subscribe_website, \
     unsubscribe_website, remove_website
+from helpers.parsing import extract_host
 
 
 class BaseBotMixin:
@@ -97,7 +98,7 @@ class AddHostHandle(BaseBotMixin,
 
     async def handle_add_host(self, message: types.Message, state: FSMContext):
         async with state.proxy() as data:
-            data[HOST_KEY] = message.text
+            data[HOST_KEY] = extract_host(message.text)
 
         await AddWebsiteForm.next()
         await message.reply('What is your public alias for this website?')

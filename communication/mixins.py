@@ -1,15 +1,10 @@
-import re
 from abc import abstractmethod
 from typing import Dict
 
 from communication.base import BusMessage
 from communication.manager import Bus
 from db.website import get_website_hosts, TOKEN_KEY, HOST_KEY, get_website_tokens_hosts
-
-HOST_CLEAN_PATTERNS = (re.compile(r'(https://)?'),
-                       re.compile(r'(http://)?'),
-                       re.compile(r'(www\.)?'),
-                       re.compile(r'(/$)?'))
+from helpers.parsing import extract_host
 
 
 class BusMixin:
@@ -48,6 +43,8 @@ class BusMixin:
     def verify_bus_sender(self, host: str, token: str):
         if token not in self._bus_websites:
             self._update_tokens()
+        # Clean host string from http, www, etc.
+        host = extract_host(host)
         if token in self._bus_websites and self._bus_websites[token] in host:
             return True
         print(f'Token and/or host are incorrect')
