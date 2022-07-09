@@ -11,5 +11,6 @@ COPY ./communication ./communication
 COPY ./db ./db
 COPY ./telegram ./telegram
 COPY ./ws ./ws
+COPY ./helpers ./helpers
 
 CMD ["python3", "start.py"]
