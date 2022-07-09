@@ -35,7 +35,7 @@ class WebsocketServer(BusMixin):
             await websocket.send('The website is not available')
             await websocket.close()
             return False
-        host = websocket.origin if websocket.origin != 'null' else '127.0.0.1'
+        host = websocket.origin
         if not self.verify_bus_sender(host, message[TOKEN_KEY]):
             await websocket.send('Token or host is incorrect')
             await websocket.close()
