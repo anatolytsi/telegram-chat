@@ -7,7 +7,7 @@ from aiogram.dispatcher import FSMContext
 from communication.base import BusDir, BusMessage
 from communication.mixins import BusMixin
 from db.messaging import ChatMessage
-from db.website import TOKEN_KEY, get_full_session_key, get_host_from_token, get_token_from_host
+from db.website import TOKEN_KEY, get_full_session_key, get_host_from_token, get_token_from_host, is_user_subscribed
 from telegram.base import TelegramBotMixin
 
 HOST_TXT = ''
@@ -38,6 +38,10 @@ class TelegramBot(BusMixin, TelegramBotMixin):
             # token_end = re.search(f'^{TOKEN_TXT}([^\n]+)', parent_text, re.M).group(1)
             session_key_end = re.search(f'^{SESSION_TXT}([^\n]+)', parent_text, re.M).group(1)
             token = get_token_from_host(host)
+            chat = message.from_user.username if message.chat.type == 'private' else message.chat.title
+            if not is_user_subscribed(chat, token):
+                await message.reply('You are no longer subscribed to this website!')
+                return
             # token = get_full_token(token_end)
             session_key = get_full_session_key(token, session_key_end)
             data = ChatMessage(token=token,

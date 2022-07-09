@@ -224,6 +224,14 @@ def unsubscribe_website(username: str, token: str, password: str) -> str:
         return ''
 
 
+def is_user_subscribed(username: str, token: str) -> bool:
+    subscribers = get_website_subscribers(token)
+    for sub in subscribers:
+        if sub[USERNAME_KEY] == username:
+            return True
+    return False
+
+
 if __name__ == '__main__':
     delete_db()
     # print(get_all_websites())
