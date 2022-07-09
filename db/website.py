@@ -199,6 +199,37 @@ def get_website_sessions(token: str) -> List[str]:
     return website[SESSIONS_KEY][SESSION_KEY]
 
 
+def ban_session(token: str, session: str) -> bool:
+    websites = get_websites_col()
+    website = get_website(websites, token)
+    for idx, ses in enumerate(website[SESSIONS_KEY]):
+        if ses[SESSION_KEY] == session:
+            website[SESSIONS_KEY][idx][BANNED_KEY] = True
+            websites.replace_one({TOKEN_KEY: token}, website, upsert=True)
+            return True
+    return False
+
+
+def unban_session(token: str, session: str) -> bool:
+    websites = get_websites_col()
+    website = get_website(websites, token)
+    for idx, ses in enumerate(website[SESSIONS_KEY]):
+        if ses[SESSION_KEY] == session:
+            website[SESSIONS_KEY][idx][BANNED_KEY] = False
+            websites.replace_one({TOKEN_KEY: token}, website, upsert=True)
+            return True
+    return False
+
+
+def is_session_banned(token: str, session: str) -> bool:
+    websites = get_websites_col()
+    website = get_website(websites, token)
+    for idx, ses in enumerate(website[SESSIONS_KEY]):
+        if ses[SESSION_KEY] == session:
+            return website[SESSIONS_KEY][idx][BANNED_KEY]
+    return False
+
+
 def subscribe_website(username: str, user_channel: int, token: str, password: str) -> str:
     try:
         websites = get_websites_col()
