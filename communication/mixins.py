@@ -28,6 +28,10 @@ class BusMixin:
         self._bus_websites[token] = host
         self._bus.subscribe(token, self._sub_dir, lambda msg: self._on_bus_message(msg))
 
+    def _unsubscribe_bus(self, token: str):
+        del self._bus_websites[token]
+        self._bus.unsubscribe(token, self._sub_dir)
+
     async def _on_bus_message(self, message: BusMessage):
         # if self.verify_bus_sender(message[DATA_KEY][HOST_KEY], message[CHANNEL_KEY]):
         #     # TODO: send an error message?
@@ -36,6 +40,10 @@ class BusMixin:
 
     def _update_websites(self):
         tokens_hosts = get_website_tokens_hosts()
+        db_tokens = [th[TOKEN_KEY] for th in tokens_hosts]
+        for bus_token in self._bus_websites:
+            if bus_token not in db_tokens:
+                self._unsubscribe_bus(bus_token)
         for token_host in tokens_hosts:
             if token_host[TOKEN_KEY] not in self._bus_websites:
                 self._subscribe_bus(token_host[HOST_KEY], token_host[TOKEN_KEY])
