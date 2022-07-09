@@ -54,4 +54,4 @@ class TelegramBot(BusMixin, TelegramBotMixin):
 
     async def handle_add_pass(self, message: types.Message, state: FSMContext):
         await super().handle_add_pass(message, state)
-        self._update_tokens()
+        self._update_websites()

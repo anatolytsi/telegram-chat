@@ -34,7 +34,7 @@ class BusMixin:
         #     return await self.on_bus_message(message)
         return await self.on_bus_message(message)
 
-    def _update_tokens(self):
+    def _update_websites(self):
         tokens_hosts = get_website_tokens_hosts()
         for token_host in tokens_hosts:
             if token_host[TOKEN_KEY] not in self._bus_websites:
@@ -42,7 +42,7 @@ class BusMixin:
 
     def verify_bus_sender(self, host: str, token: str):
         if token not in self._bus_websites:
-            self._update_tokens()
+            self._update_websites()
         # Clean host string from http, www, etc.
         host = extract_host(host)
         if token in self._bus_websites and self._bus_websites[token] in host:
@@ -53,7 +53,7 @@ class BusMixin:
     @abstractmethod
     async def on_bus_message(self, message: BusMessage):
         if message.data[TOKEN_KEY] not in self._bus_websites:
-            self._update_tokens()
+            self._update_websites()
 
     def send_bus_message(self, token: str, data: any):
         message = BusMessage(channel=token, direction=self._pub_dir, data=data)
