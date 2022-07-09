@@ -5,7 +5,7 @@ import pymongo
 from dataclasses_json import dataclass_json
 
 from db.base import MongoManager, DATABASE
-from db.website import get_website_sessions
+from db.website import get_website_sessions_keys
 
 TIMESTAMP_KEY = 'timestamp'
 
@@ -27,7 +27,7 @@ def get_session_col_name(token: str, session_key: str):
 
 def get_session_col(token: str, session_key: str):
     db = MongoManager().client[DATABASE]
-    sessions = get_website_sessions(token)
+    sessions = get_website_sessions_keys(token)
     if session_key not in sessions:
         raise Exception(f'Invalid session key')
     session = db[get_session_col_name(token, session_key)]

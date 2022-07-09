@@ -196,7 +196,13 @@ def validate_website_session(token: str, session_key: str) -> bool:
 def get_website_sessions(token: str) -> List[str]:
     websites = get_websites_col()
     website = get_website(websites, token)
-    return website[SESSIONS_KEY][SESSION_KEY]
+    return website[SESSIONS_KEY]
+
+
+def get_website_sessions_keys(token: str) -> List[str]:
+    websites = get_websites_col()
+    website = get_website(websites, token)
+    return [ses[SESSION_KEY] for ses in website[SESSIONS_KEY]]
 
 
 def ban_session(token: str, session: str) -> bool:
