@@ -2,6 +2,7 @@ import re
 import time
 
 from aiogram import types
+from aiogram.dispatcher import FSMContext
 
 from communication.base import BusDir, BusMessage
 from communication.mixins import BusMixin
@@ -50,3 +51,7 @@ class TelegramBot(BusMixin, TelegramBotMixin):
             await self._bot.send_message(chat_id=message.from_user.id,
                                          text='Message you replied to is incorrect and does not belong to any chat',
                                          disable_notification=True)
+
+    async def handle_add_pass(self, message: types.Message, state: FSMContext):
+        await super().handle_add_pass(message, state)
+        self._update_tokens()
