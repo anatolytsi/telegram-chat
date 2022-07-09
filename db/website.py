@@ -13,6 +13,8 @@ CREATOR_KEY = 'creator'
 PASSWORD_KEY = 'password'
 SUBS_KEY = 'subscribers'
 SESSIONS_KEY = 'sessions'
+SESSION_KEY = 'session'
+BANNED_KEY = 'banned'
 WEBSITES_PROTO = {
     TOKEN_KEY: '',
     HOST_KEY: '',
@@ -81,7 +83,8 @@ def get_full_session_key(token: str, session_end: str) -> str:
     try:
         websites = get_websites_col()
         website = get_website(websites, token)
-        return list(filter(re.compile(f'-{session_end}$').search, website[SESSIONS_KEY]))[0]
+        sessions = [ses[SESSION_KEY] for ses in website[SESSIONS_KEY]]
+        return list(filter(re.compile(f'-{session_end}$').search, sessions))[0]
     except Exception as e:
         print(e)
         return ''
@@ -171,7 +174,7 @@ def create_session_website(token: str) -> str:
         websites = get_websites_col()
         website = get_website(websites, token)
         session_key = f'{uuid.uuid4()}'
-        website[SESSIONS_KEY].append(session_key)
+        website[SESSIONS_KEY].append({SESSION_KEY: session_key, BANNED_KEY: False})
         websites.replace_one({TOKEN_KEY: token}, website, upsert=True)
         return session_key
     except Exception as e:
@@ -183,7 +186,7 @@ def validate_website_session(token: str, session_key: str) -> bool:
     try:
         websites = get_websites_col()
         website = get_website(websites, token)
-        if session_key in website[SESSIONS_KEY]:
+        if session_key in [ses[SESSION_KEY] for ses in website[SESSIONS_KEY]]:
             return True
     except Exception as e:
         print(e)
@@ -193,7 +196,7 @@ def validate_website_session(token: str, session_key: str) -> bool:
 def get_website_sessions(token: str) -> List[str]:
     websites = get_websites_col()
     website = get_website(websites, token)
-    return website[SESSIONS_KEY]
+    return website[SESSIONS_KEY][SESSION_KEY]
 
 
 def subscribe_website(username: str, user_channel: int, token: str, password: str) -> str:
