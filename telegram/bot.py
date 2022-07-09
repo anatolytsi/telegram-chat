@@ -48,7 +48,7 @@ class TelegramBot(BusMixin, TelegramBotMixin):
                                username=message.from_user.username)
             self.send_bus_message(token, data.to_dict())
         except AttributeError:
-            await self._bot.send_message(chat_id=message.from_user.id,
+            await self._bot.send_message(chat_id=message.chat.id,
                                          text='Message you replied to is incorrect and does not belong to any chat',
                                          disable_notification=True)
 

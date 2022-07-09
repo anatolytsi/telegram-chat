@@ -125,7 +125,10 @@ class AddPassHandle(BaseBotMixin,
     async def handle_add_pass(self, message: types.Message, state: FSMContext):
         async with state.proxy() as data:
             data[PASSWORD_KEY] = message.text
-            token = add_website(message.chat.username, message.chat.id, **dict(data))
+            if message.chat.type == 'private':
+                token = add_website(message.chat.username, **dict(data))
+            else:
+                token = add_website(message.chat.title, **dict(data))
             markup = types.ReplyKeyboardRemove()
             if token:
                 await message.answer(f'Success!🥳\n'
@@ -178,7 +181,10 @@ class RemovePassHandle(BaseBotMixin,
     async def handle_remove_pass(self, message: types.Message, state: FSMContext):
         async with state.proxy() as data:
             data[PASSWORD_KEY] = message.text
-            alias = remove_website(message.chat.username, **dict(data))
+            if message.chat.type == 'private':
+                alias = remove_website(message.chat.username, **dict(data))
+            else:
+                alias = remove_website(message.chat.title, **dict(data))
             markup = types.ReplyKeyboardRemove()
             if alias:
                 await message.answer(f'Success!\n'
@@ -201,7 +207,7 @@ class SubWebsiteEntry(BaseBotMixin,
 
     async def handle_sub_website(self, message: types.Message):
         await SubWebsiteForm.token.set()
-        await message.reply('What is your website token that you want to unsubscribe from?')
+        await message.reply('What is your website token that you want to subscribe to?')
 
 
 class SubTokenHandle(BaseBotMixin,
@@ -225,7 +231,10 @@ class SubPassHandle(BaseBotMixin,
     async def handle_sub_pass(self, message: types.Message, state: FSMContext):
         async with state.proxy() as data:
             data[PASSWORD_KEY] = message.text
-            alias = subscribe_website(message.chat.username, message.chat.id, **dict(data))
+            if message.chat.type == 'private':
+                alias = subscribe_website(message.chat.username, message.chat.id, **dict(data))
+            else:
+                alias = subscribe_website(message.chat.title, message.chat.id, **dict(data))
             markup = types.ReplyKeyboardRemove()
             if alias:
                 await message.answer(f'Success!\n'
@@ -272,7 +281,10 @@ class UnsubPassHandle(BaseBotMixin,
     async def handle_unsub_pass(self, message: types.Message, state: FSMContext):
         async with state.proxy() as data:
             data[PASSWORD_KEY] = message.text
-            alias = unsubscribe_website(message.chat.username, **dict(data))
+            if message.chat.type == 'private':
+                alias = unsubscribe_website(message.chat.username, **dict(data))
+            else:
+                alias = unsubscribe_website(message.chat.title, **dict(data))
             markup = types.ReplyKeyboardRemove()
             if alias:
                 await message.answer(f'Success!\n'
