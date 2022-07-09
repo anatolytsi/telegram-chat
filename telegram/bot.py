@@ -60,7 +60,7 @@ class TelegramBot(BusMixin, TelegramBotMixin):
         except AttributeError:
             await self._bot.send_message(chat_id=message.chat.id,
                                          text='Message you replied to is incorrect and does not belong to any chat',
-                                         disable_notification=True)
+                                         disable_notification=False)
 
     async def handle_add_pass(self, message: types.Message, state: FSMContext):
         await super().handle_add_pass(message, state)

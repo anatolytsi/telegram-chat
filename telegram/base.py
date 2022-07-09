@@ -26,7 +26,7 @@ class TelegramBotMixin(BotStartHandleMixin, BotMessageHandleMixin, BotWebsitesMi
     async def _send_to_channels(self, channels: List[str], msg: str):
         return await asyncio.gather(
             *[self._bot.send_message(chat_id=channel,
-                                     text=msg, disable_notification=True, parse_mode='HTML')
+                                     text=msg, disable_notification=False, parse_mode='HTML')
               for channel in channels])
 
     async def send_tg_message(self, token: str, msg: str):
