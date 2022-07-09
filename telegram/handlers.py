@@ -3,8 +3,9 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 
 from db.website import HOST_KEY, ALIAS_KEY, PASSWORD_KEY, add_website, TOKEN_KEY, subscribe_website, \
-    unsubscribe_website, remove_website
+    unsubscribe_website, remove_website, get_token_from_host, get_full_session_key, ban_session, unban_session
 from helpers.parsing import extract_host
+from telegram.formatter import REPLY_TXT, get_host_from_msg, get_session_end_from_msg, get_user_from_msg
 
 
 class BaseBotMixin:
@@ -78,6 +79,68 @@ class BotCancelStateHandleMixin(BaseBotMixin,
         await state.finish()
         # And remove keyboard (just in case)
         await message.reply('Operation cancelled', reply_markup=types.ReplyKeyboardRemove())
+
+
+class BotBanHandleMixin(BaseBotMixin,
+                        handler='handle_ban',
+                        commands=['ban'],
+                        description='Ban user by reply',
+                        state=None):
+
+    async def handle_ban(self, message: types.Message):
+        try:
+            if message.reply_to_message:
+                parent_text = message.reply_to_message.text
+                if REPLY_TXT in parent_text:
+                    await message.reply('Select a message reply from user')
+                    return
+                host = get_host_from_msg(parent_text)
+                session_key_end = get_session_end_from_msg(parent_text)
+                user = get_user_from_msg(parent_text)
+                token = get_token_from_host(host)
+                session_key = get_full_session_key(token, session_key_end)
+                if ban_session(token, session_key):
+                    await message.reply(f'User {user} was banned!')
+                else:
+                    await message.reply(f'Session not found')
+            else:
+                await message.reply('Select a message reply from user')
+        except Exception as e:
+            print(e)
+            await message.reply('Incorrect message selected')
+
+
+class BotUnbanHandleMixin(BaseBotMixin,
+                          handler='handle_unban',
+                          commands=['unban'],
+                          description='Unban user by reply',
+                          state=None):
+
+    async def handle_unban(self, message: types.Message):
+        try:
+            if message.reply_to_message:
+                parent_text = message.reply_to_message.text
+                if REPLY_TXT in parent_text:
+                    await message.reply('Select a message reply from user')
+                    return
+                host = get_host_from_msg(parent_text)
+                session_key_end = get_session_end_from_msg(parent_text)
+                user = get_user_from_msg(parent_text)
+                token = get_token_from_host(host)
+                session_key = get_full_session_key(token, session_key_end)
+                if unban_session(token, session_key):
+                    await message.reply(f'User {user} was unbanned!')
+                else:
+                    await message.reply(f'Session not found')
+            else:
+                await message.reply('Select a message reply from user')
+        except Exception as e:
+            print(e)
+            await message.reply('Incorrect message selected')
+
+
+class BotBanningMixin(BotBanHandleMixin, BotUnbanHandleMixin):
+    pass
 
 
 class AddWebsiteEntry(BaseBotMixin,

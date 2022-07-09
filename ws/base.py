@@ -9,7 +9,7 @@ from websockets.legacy.server import WebSocketServerProtocol
 from communication.base import BusDir, BusMessage
 from communication.mixins import BusMixin
 from db.messaging import ChatMessage, add_message, get_messages
-from db.website import TOKEN_KEY, create_session_website, validate_website_session
+from db.website import TOKEN_KEY, create_session_website, validate_website_session, is_session_banned
 
 SESSION_KEY = 'session'
 HISTORY_KEY = 'history'
@@ -38,6 +38,10 @@ class WebsocketServer(BusMixin):
         host = websocket.origin
         if not self.verify_bus_sender(host, message[TOKEN_KEY]):
             await websocket.send('Token or host is incorrect')
+            await websocket.close()
+            return False
+        if is_session_banned(message[TOKEN_KEY], message[SESSION_KEY]):
+            await websocket.send('User is banned')
             await websocket.close()
             return False
         return True
