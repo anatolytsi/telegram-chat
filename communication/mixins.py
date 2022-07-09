@@ -53,7 +53,7 @@ class BusMixin:
             self._update_websites()
         # Clean host string from http, www, etc.
         host = extract_host(host)
-        if token in self._bus_websites and self._bus_websites[token] in host:
+        if token in self._bus_websites and self._bus_websites[token] == host:
             return True
         print(f'Token and/or host are incorrect')
         return False
