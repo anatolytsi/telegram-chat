@@ -200,7 +200,7 @@ def subscribe_website(username: str, user_channel: int, token: str, password: st
     try:
         websites = get_websites_col()
         website = get_website_privileged(websites, token, password)
-        if username not in website[SUBS_KEY]:
+        if username not in [user[USERNAME_KEY] for user in website[SUBS_KEY]]:
             website[SUBS_KEY].append({USERNAME_KEY: username, USER_CHANNEL_KEY: user_channel})
             websites.replace_one({TOKEN_KEY: token}, website, upsert=True)
         return website[ALIAS_KEY]
@@ -213,9 +213,11 @@ def unsubscribe_website(username: str, token: str, password: str) -> str:
     try:
         websites = get_websites_col()
         website = get_website_privileged(websites, token, password)
-        if username in website[SUBS_KEY]:
-            website[SUBS_KEY].remove(username)
-            websites.update_one(website)
+        for user in website[SUBS_KEY]:
+            if user[USERNAME_KEY] == username:
+                website[SUBS_KEY].remove(user)
+                websites.replace_one({TOKEN_KEY: token}, website, upsert=True)
+                break
         return website[ALIAS_KEY]
     except Exception as e:
         print(e)
