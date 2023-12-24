@@ -55,7 +55,7 @@ class BusMixin:
         host = extract_host(host)
         if token in self._bus_websites and self._bus_websites[token] == host:
             return True
-        print(f'Token and/or host are incorrect')
+        print(f'Token ({token}) and/or host ({host}) are incorrect! Websites = {self._bus_websites}')
         return False
 
     @abstractmethod
